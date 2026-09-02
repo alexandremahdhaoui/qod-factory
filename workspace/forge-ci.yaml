@@ -1,0 +1,154 @@
+name: qod
+
+artifactStorePath: .forge-ci/artifact-store.yaml
+
+repos:
+  - name: qod-core
+    url: git@github.com:alexandremahdhaoui/qod-core.git
+    ref: main
+  - name: qod-app
+    url: git@github.com:alexandremahdhaoui/qod-app.git
+    ref: main
+  - name: qod-engines
+    url: git@github.com:alexandremahdhaoui/qod-engines.git
+    ref: main
+  - name: qod-configgen
+    url: git@github.com:alexandremahdhaoui/qod-configgen.git
+    ref: main
+  - name: qod-register
+    url: git@github.com:alexandremahdhaoui/qod-register.git
+    ref: main
+
+managers:
+  - alias: local
+    engine: "forge://github.com/alexandremahdhaoui/forge-ci/cmd/ci-manager-local@v0.1.0"
+    spec:
+      statePath: .forge-ci/manager-local.json
+
+  - alias: github
+    engine: "forge://github.com/alexandremahdhaoui/forge-ci/cmd/ci-manager-github"
+    spec:
+      statePath: .forge-ci/manager-github.json
+      tokenEnv: FORGE_CI_GITHUB_TOKEN
+
+engines:
+  - alias: here
+    type: compute
+    engine: "forge://github.com/alexandremahdhaoui/forge-ci/cmd/ci-compute-local@v0.1.0"
+    manager: local
+
+  - alias: ci-state
+    type: state
+    engine: "forge://github.com/alexandremahdhaoui/forge-ci/cmd/ci-state-git@v0.1.0"
+    manager: local
+    spec:
+      path: qod-state
+      kinds: [dependency-lock]
+
+  - alias: dist-release
+    type: artifact
+    engine: "forge://github.com/alexandremahdhaoui/forge-ci/cmd/ci-artifact-release"
+    manager: local
+    spec:
+      repo: alexandremahdhaoui/qod-factory
+
+  - alias: actions
+    type: compute
+    engine: "forge://github.com/alexandremahdhaoui/forge-ci/cmd/ci-compute-github"
+    manager: github
+    spec:
+      repo: alexandremahdhaoui/qod-factory
+      dir: qod-factory
+      containerFile: .forge/toolchain-image
+      workspace:
+        bootstrapCommand: forge clone git@github.com:alexandremahdhaoui/qod-factory.git .
+      secrets:
+        - name: FORGE_CI_GITHUB_TOKEN
+          fromEnv: FORGE_CI_GITHUB_TOKEN
+        - name: FORGE_CI_DISPATCH_TOKEN
+          fromEnv: FORGE_CI_DISPATCH_TOKEN
+      workflows:
+        - name: ci
+          kind: command
+          header: |
+            # The pipeline is the CI. A repo cannot be built alone here.
+            # member-pushed is what a member sends on push. register-tag is
+            # the same machinery pointed the other way.
+          events: [member-pushed, register-tag]
+          reportFailure: true
+          pushBranches: [main]
+          job: apply
+          stepName: Apply the pipeline
+          secret: FORGE_CI_GITHUB_TOKEN
+          command: |
+            forge-ci apply --config forge-ci.yaml --root .
+        - name: release
+          kind: release
+          secret: FORGE_CI_GITHUB_TOKEN
+
+  - alias: on-change
+    type: trigger
+    engine: "forge://github.com/alexandremahdhaoui/forge-ci/cmd/ci-trigger-watch"
+    manager: github
+    spec:
+      watch:
+        - qod-core
+        - qod-app
+        - qod-engines
+        - qod-configgen
+        - qod-spec
+      notify:
+        owner: alexandremahdhaoui
+        factory: qod-factory
+        eventType: member-pushed
+        secret: FORGE_CI_DISPATCH_TOKEN
+
+  - alias: all-pass
+    type: promotion
+    engine: "forge://github.com/alexandremahdhaoui/forge-ci/cmd/ci-promotion-all@v0.1.0"
+    manager: local
+
+state: ci-state
+triggers: [on-change]
+
+targets:
+  - alias: check-config
+    forge: config validate
+    in: [qod-core, qod-app, qod-engines, qod-configgen, qod-register]
+
+  - alias: build-all
+    forge: test-all
+    in: [qod-core, qod-app, qod-engines, qod-configgen]
+
+  - alias: publish-members
+    forge: test run publish-members
+    in: [qod-register]
+
+stages:
+  - name: check
+    promotion: all-pass
+    substages:
+      - name: default
+        engine: here
+        manager: local
+        targets: [check-config]
+
+  - name: build
+    mint: true
+    promotion: all-pass
+    substages:
+      - name: default
+        engine: here
+        manager: local
+        sync: true
+        targets: [build-all]
+
+  - name: publish
+    promotion: all-pass
+    release: dist-release
+    releaseRepos: [qod-core, qod-app, qod-engines, qod-configgen]
+    substages:
+      - name: default
+        engine: here
+        manager: local
+        targets: [publish-members]

@@ -1,0 +1,125 @@
+version: "1"
+name: qod
+
+repos:
+  - name: qod-core
+    url: git@github.com:alexandremahdhaoui/qod-core.git
+    languages: [rust]
+
+  - name: qod-app
+    url: git@github.com:alexandremahdhaoui/qod-app.git
+    languages: [rust]
+
+  - name: qod-engines
+    url: git@github.com:alexandremahdhaoui/qod-engines.git
+    languages: [go]
+
+  - name: qod-configgen
+    url: git@github.com:alexandremahdhaoui/qod-configgen.git
+    languages: [go]
+
+  - name: qod-spec
+    url: git@github.com:alexandremahdhaoui/qod-spec.git
+
+  - name: qod-register
+    url: git@github.com:alexandremahdhaoui/qod-register.git
+
+  - name: qod-factory
+    url: git@github.com:alexandremahdhaoui/qod-factory.git
+
+  - name: qod-state
+    url: git@github.com:alexandremahdhaoui/qod-state.git
+
+  - name: forge-ci
+    url: git@github.com:alexandremahdhaoui/forge-ci.git
+    languages: [go]
+
+  - name: forge-factory
+    url: git@github.com:alexandremahdhaoui/forge-factory.git
+    languages: [go]
+
+  - name: forge-register
+    url: git@github.com:alexandremahdhaoui/forge-register.git
+    languages: [go]
+
+  - name: forge-dev-codegen
+    url: git@github.com:alexandremahdhaoui/forge-dev-codegen.git
+    languages: [go]
+
+  - name: forge-ci-spec
+    url: git@github.com:alexandremahdhaoui/forge-ci-spec.git
+
+  - name: forge-revision-spec
+    url: git@github.com:alexandremahdhaoui/forge-revision-spec.git
+    languages: [go]
+
+  - name: forge-register-spec
+    url: git@github.com:alexandremahdhaoui/forge-register-spec.git
+    languages: [go]
+
+register:
+  url: git@github.com:alexandremahdhaoui/qod-register.git
+
+dependencies:
+  go:
+    github.com/alexandremahdhaoui/forge: v0.43.0
+    github.com/google/go-containerregistry: {}
+    github.com/modelcontextprotocol/go-sdk: {}
+    github.com/oapi-codegen/runtime: {}
+    github.com/spf13/cobra: {}
+    github.com/stretchr/testify: {}
+    golang.org/x/crypto:
+      acknowledge:
+        - id: GO-2026-5932
+          reason: "openpgp is unmaintained by design and has no fix. This
+            workspace imports golang.org/x/crypto/nacl/box only, in forge-ci's
+            githubadapter, to seal Actions secrets. Nothing under openpgp/ is
+            in any build."
+    sigs.k8s.io/yaml: {}
+
+  rust:
+    anyhow: {}
+    clap: {}
+    flatbuffers: {}
+    lz4_flex: {}
+    mockall: {}
+    reqwest: { wraps: '{ version = "%s", default-features = false, features = ["json", "rustls"] }' }
+    rustls: {}
+    serde: { wraps: '{ version = "%s", features = ["derive"] }' }
+    serde_json: {}
+    thiserror: {}
+
+toolchain:
+  binaries:
+    - name: mockery
+      module: github.com/vektra/mockery/v3
+      track: go:github.com/vektra/mockery/v3
+    - name: oapi-codegen
+      module: github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen
+      track: go:github.com/oapi-codegen/oapi-codegen/v2
+    - name: golangci-lint
+      module: github.com/golangci/golangci-lint/v2/cmd/golangci-lint
+      track: go:github.com/golangci/golangci-lint/v2
+
+  image:
+    ref: ghcr.io/alexandremahdhaoui/forge
+    track: internal:ghcr.io/alexandremahdhaoui/forge
+
+  runtimes:
+    go: { version: "1.26.5" }
+    rust: { version: "1.97.0" }
+
+engines:
+  - alias: go
+    engine: forge://github.com/alexandremahdhaoui/forge-factory/cmd/factory-lang-go
+  - alias: rust
+    engine: forge://github.com/alexandremahdhaoui/forge-factory/cmd/factory-lang-rust
+  - alias: fetch
+    engine: forge://github.com/alexandremahdhaoui/forge-factory/cmd/factory-fetch
+  - alias: install
+    engine: forge://github.com/alexandremahdhaoui/forge-factory/cmd/factory-install
+
+state:
+  engine: forge://github.com/alexandremahdhaoui/forge-ci/cmd/ci-state-git
+  spec:
+    path: ./qod-state

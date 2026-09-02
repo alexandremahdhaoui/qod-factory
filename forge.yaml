@@ -1,0 +1,23 @@
+name: qod-factory
+
+artifactStorePath: .forge/artifact-store.yaml
+
+build:
+  - name: noop
+    src: .
+    engine: forge://generic-builder
+    spec:
+      command: "true"
+
+test:
+  - name: factory
+    runner: forge://generic-test-runner
+    spec:
+      command: sh
+      args: ["hack/factory-check.sh"]
+
+  - name: no-stubs
+    runner: forge://generic-test-runner
+    spec:
+      command: sh
+      args: ["hack/no-stubs.sh"]
