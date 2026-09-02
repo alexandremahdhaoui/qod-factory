@@ -5,9 +5,9 @@ on fights, economy and gearing. Not a bot.
 
 ## Now
 
-Eight public repos exist under `alexandremahdhaoui`, all Apache-2.0.
-`qod-factory` is pushed and validated on toolchain `v0.45.38`. Next is
-`qod-register`.
+`qod-factory`, `qod-register` and `qod-state` are pushed. The register holds 20
+admitted tracks, one per pinned package. Next is the checkpoint: `forge clone`
+into a clean directory.
 
 ## The project
 
@@ -35,19 +35,16 @@ using `engine: forge://forge-dev`.
 
 ## Next
 
-1. Write `qod-register`: `forge-register.yaml`, `forge.yaml`, `hack/seed.sh`
-   naming the ten crates, `hack/publish-members.sh`, `hack/canary.sh`. Seed it.
-3. Write `qod-state`. Only a `.gitignore`.
-4. `forge clone git@github.com:alexandremahdhaoui/qod-factory.git .` into a
+1. `forge clone git@github.com:alexandremahdhaoui/qod-factory.git .` into a
    clean directory. **The checkpoint.**
-5. Supply `FORGE_CI_GITHUB_TOKEN` and `FORGE_CI_DISPATCH_TOKEN`, run
+2. Supply `FORGE_CI_GITHUB_TOKEN` and `FORGE_CI_DISPATCH_TOKEN`, run
    `forge-ci apply`, confirm `ci.yaml` and `release.yaml` generate.
-6. Move `docs/` and `notes.md` into `qod-factory/workspace/`.
-7. `qod-engines` with `flatbuffers-rust`. Then `qod-core`, `qod-spec`,
+3. Move `docs/` and `notes.md` into `qod-factory/workspace/`.
+4. `qod-engines` with `flatbuffers-rust`. Then `qod-core`, `qod-spec`,
    `qod-configgen`, `qod-app`.
-8. Spike: do Dofus 3 bundles carry a Unity type tree? Half a day. Go or no-go for
+5. Spike: do Dofus 3 bundles carry a Unity type tree? Half a day. Go or no-go for
    the whole data extractor.
-9. Build the extractor.
+6. Build the extractor.
 
 Later: the overlay itself, then the collaboration webpage.
 
