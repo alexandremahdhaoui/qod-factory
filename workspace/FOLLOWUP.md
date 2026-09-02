@@ -5,13 +5,14 @@ on fights, economy and gearing. Not a bot.
 
 ## Now
 
-**The workspace is real.** `~/workspaces/qod` was stood up by `forge clone`: 15
-members, every manifest, runtimes from the store. `qod-core` and `qod-app` pass
-`forge test-all` from that toolchain. Next: `forge ci apply`, which needs the two
-tokens in `qod-factory/.envrc` below the managed block.
+**The pipeline is green.** Run 33633061790 on 2026-09-02: `check`, `build` with
+every gate on all four language members, `publish` into `qod-register`, release
+`v0.1.0` in `qod-factory`, `v0.1.0` tags on the members. The factory phase is
+done. The research and factory docs live in `qod-factory/docs/`. Next is the
+first engine.
 
-The clones under `~/workspaces/dofus-overlay` are stale duplicates. Only the
-research docs there still matter, until they move into `qod-factory/workspace/`.
+The real workspace is `~/workspaces/qod`. The tokens live in its root `.envrc`.
+`~/workspaces/dofus-overlay` is retired.
 
 ## The project
 
@@ -39,14 +40,11 @@ using `engine: forge://forge-dev`.
 
 ## Next
 
-1. Supply `FORGE_CI_GITHUB_TOKEN` and `FORGE_CI_DISPATCH_TOKEN`, run
-   `forge-ci apply`, confirm `ci.yaml` and `release.yaml` generate.
-2. Move `docs/` and `notes.md` into `qod-factory/workspace/`.
-3. `qod-engines` with `flatbuffers-rust`. Then `qod-core`, `qod-spec`,
+1. `qod-engines` with `flatbuffers-rust`. Then `qod-core`, `qod-spec`,
    `qod-configgen`, `qod-app`.
-4. Spike: do Dofus 3 bundles carry a Unity type tree? Half a day. Go or no-go for
+3. Spike: do Dofus 3 bundles carry a Unity type tree? Half a day. Go or no-go for
    the whole data extractor.
-5. Build the extractor.
+4. Build the extractor.
 
 Later: the overlay itself, then the collaboration webpage.
 
@@ -106,6 +104,11 @@ and `forge ci`, which put `.forge/bin` first on PATH.
 `forge ci apply` pushes the generated workflows, and a push fires them at once.
 Apply first means every first run fails for a missing secret. Done in the wrong
 order on 2026-09-02, five notify runs re-run by hand.
+
+**The release engine needs `tokenEnv`.** `ci-artifact-release` reads
+`GITHUB_TOKEN` by default and the generated workflow exports only
+`FORGE_CI_GITHUB_TOKEN`, so the first CI run passed `check` and `build` and
+died on `publish` with 401. golden's config has the same hole.
 
 **Engine URIs carry no version pin.** Not `@v0.1.0`, not anything. A pinned URI
 skips `.forge/bin` and goes straight to `go run module@version`, which is how
