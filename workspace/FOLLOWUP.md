@@ -102,6 +102,11 @@ then PATH, then pinned `go run`, so a stale engine on PATH silently shadows the
 release. That is what broke the first sync. Always go through `forge factory`
 and `forge ci`, which put `.forge/bin` first on PATH.
 
+**Bootstrap before apply.** `forge ci bootstrap` seals the Actions secrets.
+`forge ci apply` pushes the generated workflows, and a push fires them at once.
+Apply first means every first run fails for a missing secret. Done in the wrong
+order on 2026-09-02, five notify runs re-run by hand.
+
 **Engine URIs carry no version pin.** Not `@v0.1.0`, not anything. A pinned URI
 skips `.forge/bin` and goes straight to `go run module@version`, which is how
 `ci-state-git@v0.1.0` failed. Bare URI or `@latest` only.
