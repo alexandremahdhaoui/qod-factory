@@ -21,7 +21,7 @@ repos:
 
 managers:
   - alias: local
-    engine: "forge://github.com/alexandremahdhaoui/forge-ci/cmd/ci-manager-local@v0.1.0"
+    engine: "forge://github.com/alexandremahdhaoui/forge-ci/cmd/ci-manager-local"
     spec:
       statePath: .forge-ci/manager-local.json
 
@@ -34,12 +34,12 @@ managers:
 engines:
   - alias: here
     type: compute
-    engine: "forge://github.com/alexandremahdhaoui/forge-ci/cmd/ci-compute-local@v0.1.0"
+    engine: "forge://github.com/alexandremahdhaoui/forge-ci/cmd/ci-compute-local"
     manager: local
 
   - alias: ci-state
     type: state
-    engine: "forge://github.com/alexandremahdhaoui/forge-ci/cmd/ci-state-git@v0.1.0"
+    engine: "forge://github.com/alexandremahdhaoui/forge-ci/cmd/ci-state-git"
     manager: local
     spec:
       path: qod-state
@@ -105,7 +105,7 @@ engines:
 
   - alias: all-pass
     type: promotion
-    engine: "forge://github.com/alexandremahdhaoui/forge-ci/cmd/ci-promotion-all@v0.1.0"
+    engine: "forge://github.com/alexandremahdhaoui/forge-ci/cmd/ci-promotion-all"
     manager: local
 
 state: ci-state
