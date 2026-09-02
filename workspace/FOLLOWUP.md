@@ -102,6 +102,10 @@ then PATH, then pinned `go run`, so a stale engine on PATH silently shadows the
 release. That is what broke the first sync. Always go through `forge factory`
 and `forge ci`, which put `.forge/bin` first on PATH.
 
+**Engine URIs carry no version pin.** Not `@v0.1.0`, not anything. A pinned URI
+skips `.forge/bin` and goes straight to `go run module@version`, which is how
+`ci-state-git@v0.1.0` failed. Bare URI or `@latest` only.
+
 **Working rules.** Read the forge and golden repos at `origin/main` with
 `git show`; local checkouts run up to 90 commits stale. Never write a file
 through a heredoc, `cp`, `sed`, `awk` or python. Write and Edit only.
