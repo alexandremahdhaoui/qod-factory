@@ -5,9 +5,9 @@ on fights, economy and gearing. Not a bot.
 
 ## Now
 
-`qod-factory` is written and validated. `forge config validate`,
-`forge-factory validate` and `forge-ci validate` all pass on toolchain
-`v0.45.38`. You create the eight GitHub repos and push `qod-factory`.
+Eight public repos exist under `alexandremahdhaoui`, all Apache-2.0.
+`qod-factory` is pushed and validated on toolchain `v0.45.38`. Next is
+`qod-register`.
 
 ## The project
 
@@ -35,8 +35,7 @@ using `engine: forge://forge-dev`.
 
 ## Next
 
-1. You create the eight repos on GitHub and push `qod-factory`.
-2. Write `qod-register`: `forge-register.yaml`, `forge.yaml`, `hack/seed.sh`
+1. Write `qod-register`: `forge-register.yaml`, `forge.yaml`, `hack/seed.sh`
    naming the ten crates, `hack/publish-members.sh`, `hack/canary.sh`. Seed it.
 3. Write `qod-state`. Only a `.gitignore`.
 4. `forge clone git@github.com:alexandremahdhaoui/qod-factory.git .` into a
