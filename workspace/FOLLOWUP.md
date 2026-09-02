@@ -5,10 +5,13 @@ on fights, economy and gearing. Not a bot.
 
 ## Now
 
-**The checkpoint passed.** `forge clone` stands the workspace up from nothing:
-15 members, root `Cargo.toml` and `go.work`, every `go.mod` and `.envrc`,
-toolchain image `v0.45.38`, and `go@1.26.5` plus `rust@1.97.0` provisioned into
-the store. Next: prove a Rust gate runs from the store, then `forge-ci apply`.
+**The workspace is real.** `~/workspaces/qod` was stood up by `forge clone`: 15
+members, every manifest, runtimes from the store. `qod-core` and `qod-app` pass
+`forge test-all` from that toolchain. Next: `forge ci apply`, which needs the two
+tokens in `qod-factory/.envrc` below the managed block.
+
+The clones under `~/workspaces/dofus-overlay` are stale duplicates. Only the
+research docs there still matter, until they move into `qod-factory/workspace/`.
 
 ## The project
 
@@ -36,15 +39,14 @@ using `engine: forge://forge-dev`.
 
 ## Next
 
-1. `forge test-all` in `qod-core` and `qod-app` inside the checkpoint.
-2. Supply `FORGE_CI_GITHUB_TOKEN` and `FORGE_CI_DISPATCH_TOKEN`, run
+1. Supply `FORGE_CI_GITHUB_TOKEN` and `FORGE_CI_DISPATCH_TOKEN`, run
    `forge-ci apply`, confirm `ci.yaml` and `release.yaml` generate.
-3. Move `docs/` and `notes.md` into `qod-factory/workspace/`.
-4. `qod-engines` with `flatbuffers-rust`. Then `qod-core`, `qod-spec`,
+2. Move `docs/` and `notes.md` into `qod-factory/workspace/`.
+3. `qod-engines` with `flatbuffers-rust`. Then `qod-core`, `qod-spec`,
    `qod-configgen`, `qod-app`.
-5. Spike: do Dofus 3 bundles carry a Unity type tree? Half a day. Go or no-go for
+4. Spike: do Dofus 3 bundles carry a Unity type tree? Half a day. Go or no-go for
    the whole data extractor.
-6. Build the extractor.
+5. Build the extractor.
 
 Later: the overlay itself, then the collaboration webpage.
 
