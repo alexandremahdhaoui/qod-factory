@@ -105,6 +105,16 @@ and `forge ci`, which put `.forge/bin` first on PATH.
 Apply first means every first run fails for a missing secret. Done in the wrong
 order on 2026-09-02, five notify runs re-run by hand.
 
+**Sync appends `/.envrc` to every member's `.gitignore`.** A member whose
+ignore file lacks that exact block comes out of sync modified, the revision
+reads `-dirty`, and the release refuses. Commit the block sync writes, comment
+included. It is generated content.
+
+**Versions come from emoji subjects.** `versioning.strategy: semantic` with the
+six emoji vocabulary, `cap: v0`. Subjects are read since the last tag from the
+pipeline `repos:` only, so `qod-factory` is listed there. It stays out of
+`releaseRepos` and the watch list.
+
 **The release engine needs `tokenEnv`.** `ci-artifact-release` reads
 `GITHUB_TOKEN` by default and the generated workflow exports only
 `FORGE_CI_GITHUB_TOKEN`, so the first CI run passed `check` and `build` and
