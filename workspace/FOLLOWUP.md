@@ -5,9 +5,10 @@ on fights, economy and gearing. Not a bot.
 
 ## Now
 
-`qod-factory`, `qod-register` and `qod-state` are pushed. The register holds 20
-admitted tracks, one per pinned package. Next is the checkpoint: `forge clone`
-into a clean directory.
+**The checkpoint passed.** `forge clone` stands the workspace up from nothing:
+15 members, root `Cargo.toml` and `go.work`, every `go.mod` and `.envrc`,
+toolchain image `v0.45.38`, and `go@1.26.5` plus `rust@1.97.0` provisioned into
+the store. Next: prove a Rust gate runs from the store, then `forge-ci apply`.
 
 ## The project
 
@@ -35,8 +36,7 @@ using `engine: forge://forge-dev`.
 
 ## Next
 
-1. `forge clone git@github.com:alexandremahdhaoui/qod-factory.git .` into a
-   clean directory. **The checkpoint.**
+1. `forge test-all` in `qod-core` and `qod-app` inside the checkpoint.
 2. Supply `FORGE_CI_GITHUB_TOKEN` and `FORGE_CI_DISPATCH_TOKEN`, run
    `forge-ci apply`, confirm `ci.yaml` and `release.yaml` generate.
 3. Move `docs/` and `notes.md` into `qod-factory/workspace/`.
@@ -50,10 +50,6 @@ Later: the overlay itself, then the collaboration webpage.
 
 ## Waiting on a human
 
-- **Toolchain members.** The factory lists `forge-ci`, `forge-factory`,
-  `forge-register`, `forge-dev-codegen` and the three spec repos as members,
-  exactly as golden does. It is not verified which of them the pipeline needs.
-  The `forge clone` checkpoint tells.
 - **Ankama terms.** `account.ankama.com/fr/tou` 403s bots. Read it in a browser.
 - **Sequenced group travel.** Highest value feature, highest ban risk.
   `docs/research/06-multi-account.md`.
@@ -64,6 +60,9 @@ Later: the overlay itself, then the collaboration webpage.
 - `ci-artifact-release` assets. Declared, but nothing declares `platforms:` yet
   so no binary is distributed.
 - `jre` and `openapi-generator` runtimes. Only if a REST surface appears.
+- `hack/coverage.sh 95` in `qod-app`. It runs `cargo llvm-cov`, which is not a
+  provisioned runtime. Add once there is code to cover and a way to provision
+  the tool.
 
 ## Decided
 
@@ -95,8 +94,11 @@ by one, never added on my judgement. Approved: `reqwest`, `rustls`, `serde`,
 `go install`. A `go install` build is a dev build with no companion revision,
 so `forge factory` and `forge ci` fall through to whatever is on PATH. A
 released `forge` resolves its siblings pinned. Current: `v0.45.38`, four
-binaries, every sha256 checked against the release `index.json`. Old binaries
-sit in `~/go/bin/*.bak`.
+binaries, every sha256 checked against the release `index.json`. Every other
+forge engine in `~/go/bin` was deleted. An engine resolves as `./cmd/<name>`,
+then PATH, then pinned `go run`, so a stale engine on PATH silently shadows the
+release. That is what broke the first sync. Always go through `forge factory`
+and `forge ci`, which put `.forge/bin` first on PATH.
 
 **Working rules.** Read the forge and golden repos at `origin/main` with
 `git show`; local checkouts run up to 90 commits stale. Never write a file
@@ -119,7 +121,10 @@ files. Detail: `docs/factory/01-target-setup.md`.
 **Register.** Not empty. `forge-register.yaml` with policy params, a `forge.yaml`
 whose stages are the `forge-register` CLI, `hack/seed.sh` filing one admission
 request per package, `hack/publish-members.sh` publishing each member with the
-minted revision as provenance. The pipeline is its only writer.
+minted revision as provenance. The pipeline is its only writer. The toolchain
+image track `internal:ghcr.io/alexandremahdhaoui/forge` is published by hand
+once, with the release revision from `index.json` as provenance, or sync cannot
+resolve `toolchain.image`.
 
 **Dofus 3.** Unity IL2CPP, obfuscated symbols, protobuf protocol. Ankama detects
 behaviour, not software, and bans in waves. Multi-accounting and window
