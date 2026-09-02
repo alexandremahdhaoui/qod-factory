@@ -1,0 +1,78 @@
+# The pipeline is the CI. A repo cannot be built alone here.
+# member-pushed is what a member sends on push. register-tag is
+# the same machinery pointed the other way.
+name: ci
+
+on:
+  repository_dispatch:
+    types: [member-pushed, register-tag]
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/alexandremahdhaoui/forge:v0.45.38
+    steps:
+
+      - name: Restore the tool store
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.cache/forge
+          key: tool-store-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            tool-store-${{ runner.os }}-
+
+      - name: Check out the workspace around this repo
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.FORGE_CI_GITHUB_TOKEN }}@github.com/".insteadOf "git@github.com:"
+          forge clone git@github.com:alexandremahdhaoui/qod-factory.git .
+
+      - name: Apply the pipeline
+        env:
+          FORGE_CI_GITHUB_TOKEN: ${{ secrets.FORGE_CI_GITHUB_TOKEN }}
+        run: |
+          forge-ci apply --config forge-ci.yaml --root .
+
+      - name: Name the tool store by its content
+        id: tool-store-key
+        if: always()
+        run: |
+          echo "key=$(find ~/.cache/forge -mindepth 1 -maxdepth 3 2>/dev/null | sort | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
+
+      - name: Save the tool store
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/forge
+          key: tool-store-${{ runner.os }}-${{ steps.tool-store-key.outputs.key }}
+
+      - name: Say that the run failed
+        if: failure()
+        env:
+          TOKEN: ${{ github.token }}
+          TITLE: "ci is failing"
+        run: |
+          open=$(curl -fsS \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/issues?state=open&per_page=100")
+          if printf '%s' "$open" | grep -q "\"title\": *\"$TITLE\""; then
+            echo "an issue is already open for this; not filing another"
+            exit 0
+          fi
+          curl -fsS -X POST \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/issues" \
+            -d "{\"title\":\"$TITLE\",\"body\":\"$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID failed. Nothing else reports this run, so it reports itself. Close this once a run goes green; a failure after that files a new one.\"}"
