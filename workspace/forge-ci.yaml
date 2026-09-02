@@ -51,6 +51,7 @@ engines:
     manager: local
     spec:
       repo: alexandremahdhaoui/qod-factory
+      tokenEnv: FORGE_CI_GITHUB_TOKEN
 
   - alias: actions
     type: compute
