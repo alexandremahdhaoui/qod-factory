@@ -28,6 +28,9 @@ repos:
   - name: qod-register
     url: git@github.com:alexandremahdhaoui/qod-register.git
     ref: main
+  - name: qod-factory
+    url: git@github.com:alexandremahdhaoui/qod-factory.git
+    ref: main
 
 managers:
   - alias: local
