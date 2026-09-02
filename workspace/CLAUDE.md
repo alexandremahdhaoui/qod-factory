@@ -313,7 +313,19 @@ Headings: **Now**, **Next**, **Waiting on a human**, **Deferred**, **Decided**.
 - If a file needs reverting, say so. Let the user do it.
 - Never sign a commit as an assistant. No `Co-Authored-By`. No tool branding.
 - Never commit secrets. `.envrc` stays untracked.
-- Commits are conventional and focused.
+- Commits are focused. The subject starts with one emoji. The pipeline reads
+  it to bump the release version.
+
+| Emoji | Use | Bump |
+|---|---|---|
+| ⚠ | breaking change | major |
+| ✨ | new feature | minor |
+| 🐛 | fix | patch |
+| 🌱 | bump, update, clean up | patch |
+| 📖 | docs | none |
+| 🧹 | tests only, formatting, cosmetics | none |
+
+No emoji still bumps patch. `cap: v0` holds the major at 0 until lifted.
 
 ## 16. Tooling
 

@@ -2,6 +2,16 @@ name: qod
 
 artifactStorePath: .forge-ci/artifact-store.yaml
 
+versioning:
+  strategy: semantic
+  cap: v0
+  semantic:
+    major: ["⚠"]
+    minor: ["✨"]
+    patch: ["🐛", "🌱"]
+    ignore: ["📖", "🧹"]
+    unmatched: patch
+
 repos:
   - name: qod-core
     url: git@github.com:alexandremahdhaoui/qod-core.git
